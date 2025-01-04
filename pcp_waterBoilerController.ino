@@ -8,6 +8,7 @@ const int LED_PIN = 10;
 /// ENVIRONMENT RELATIVE PARAMETERS ///
 const int MIN_ROTATION_VALUE = 350;
 const int MAX_ROTATION_VALUE = 675;
+const int MAX_REL_ROTATION_VALUE = 40;
 
 // The switch can assume values between 0 and ~600-700.
 // We assume that a minimum value (like 300) has to be met in order to count as active.
@@ -44,6 +45,16 @@ void loop() {
   // We use the Relative Rotation Value in order to ignore the starting position of the variable resistor.
   // A rotation to the left is translated into a positive value and a rotation to the right becomes a negative value.
   int relativeRotationValue = startingRotationValue - absoluteRotationValue;
+  // If the Rotation Value exceeds a set maximum, then we adjust the starting rotation point. This is in order to never exceed the maximum
+  // relative rotation value.
+  if (abs(relativeRotationValue) > MAX_REL_ROTATION_VALUE) {
+    if (relativeRotationValue < 0) {
+      startingRotationValue += (abs(relativeRotationValue) - MAX_REL_ROTATION_VALUE);
+    } else {
+      startingRotationValue -= (abs(relativeRotationValue) - MAX_REL_ROTATION_VALUE);
+    }
+    relativeRotationValue = startingRotationValue - absoluteRotationValue;
+  }
 
   // We read the value from the Water Boiler built-in switch and light the led as an indicator.
   int switchValue = analogRead(SWITCH_PIN);
