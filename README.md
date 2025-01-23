@@ -20,6 +20,7 @@ These inputs are used to produce the following outputs:
 ## 2. Visuals
 ![Image of the Controller package](/Images/controller-01.jpeg)
 ![Image of the Controller insides](/Images/controller-02.jpeg)
+![Circuit design in fritzing](/Fritzing/arduino_circuit_design.png)
 
 Find some more detailed images of the [build process](/BUILDHISTORY.md).
 
