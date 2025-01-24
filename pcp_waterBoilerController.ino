@@ -16,7 +16,7 @@ const int SWITCH_TRIGGER_VALUE = 300;
 
 // In absolute darkness the light sensor still return about ~500 (~580 with the lid closed) as a value.
 // At maximum brightness the light sensor reaches about ~660  (with the lid open and beneath a lamp).
-const int MIN_LIGHT_VALUE = 580;
+const int MIN_LIGHT_VALUE = 540;
 const int MAX_LIGHT_VALUE = 660;
 
 
@@ -40,7 +40,8 @@ void setup() {
 
 void loop() {
   // We read the variable resistors value in order to understand the water boilers position.
-  int absoluteRotationValue = getRotationValueFromSensorValue(analogRead(ROTATION_PIN));
+  float sensorRotationValue = analogRead(ROTATION_PIN);
+  int absoluteRotationValue = getRotationValueFromSensorValue(sensorRotationValue);
 
   // We use the Relative Rotation Value in order to ignore the starting position of the variable resistor.
   // A rotation to the left is translated into a positive value and a rotation to the right becomes a negative value.
@@ -59,21 +60,27 @@ void loop() {
   // We read the value from the Water Boiler built-in switch and light the led as an indicator.
   int switchValue = analogRead(SWITCH_PIN);
   if (switchValue >= SWITCH_TRIGGER_VALUE) {
+    switchValue = 1;
     digitalWrite(LED_PIN, HIGH);
   } else {
+    switchValue = 0;
     digitalWrite(LED_PIN, LOW);
   }
 
   // We read the light reactive resistor's value in order to understand how far the water boilers lid
   // is opened.
-  int lightValue = getLightValueFromSensorValue(analogRead(LIGHT_PIN));
+  float sensorLightValue = analogRead(LIGHT_PIN);
+  int lightValue = getLightValueFromSensorValue(sensorLightValue);
 
-
+  Serial.print("SensorAbsoluteRotationValue:"); Serial.print(sensorRotationValue); // For debugging & fine tuning
+  Serial.print(",");
   Serial.print("AbsoluteRotationValue:"); Serial.print(absoluteRotationValue);
   Serial.print(",");
   Serial.print("RelativeRotationValue:"); Serial.print(relativeRotationValue);
   Serial.print(",");
   Serial.print("SwitchValue:"); Serial.print(switchValue);
+  Serial.print(",");
+  Serial.print("SensorLightValue:"); Serial.print(sensorLightValue); // For debugging & fine tuning
   Serial.print(",");
   Serial.print("LightValue:"); Serial.print(lightValue);
   Serial.println();

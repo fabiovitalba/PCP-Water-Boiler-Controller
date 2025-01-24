@@ -12,9 +12,11 @@ This Arduino Project consists in the arduino script that handles the Water Boile
 - A **switch** directly taken from the water boiler circuit. The switch consists in a broken circuit that closes whenever the button on the handle of the water boiler is closed.
 
 These inputs are used to produce the following outputs:
-- **AbsoluteRotationValue**: The absolute rotation of the water boiler. This is the raw output produced by the rotary potentiometer.
+- **SensorAbsoluteRotationValue**: The raw output produced by the rotary potentiometer.
+- **AbsoluteRotationValue**: The absolute rotation of the water boiler. This is the processed output produced by the rotary potentiometer.
 - **RelativeRotationValue**: The rotation of the water boiler, relative to its starting position. The starting position is also continuously updated, so that anytime the user reverses the rotation, that reversal is immediately effective.
 - **SwitchValue**: The output produced by the switch circuit. Whenever the switch is not being pressed this will be 0. However, when the switch is being pressed, the circuit closes and the value will raise.
+- **SensorLightValue**: The raw output produced by the photocell.
 - **LightValue**: The output produced by the photocell. Whenever the lid is closed a base-amount of light is entering the water boiler from the sidewalls. Once the lid is opened (even when only partially open), more light enters and the output of the photocell will raise.
 
 ## 2. Visuals
@@ -29,8 +31,8 @@ The Water Boiler Controller can be used as is, but should be tuned based on the 
 
 ### 3.1. Rotation settings
 _In order to tune these settings, listen to the Arduino on the Serial Port (default is 9600). Open the Serial Plotter, then continue._
-- `MIN_ROTATION_VALUE`: Rotate the water boiler completely to the left. Read the value for `AbsoluteRotationValue` and set the constant `MIN_ROTATION_VALUE` to this value. (Rounding the value a little is fine.)
-- `MAX_ROTATION_VALUE`: Rotate the water boiler completely to the right. Read the value for `AbsoluteRotationValue` and set the constant `MIN_ROTATION_VALUE` to this value. (Rounding the value a little is fine.)
+- `MIN_ROTATION_VALUE`: Rotate the water boiler completely to the left. Read the value for `SensorAbsoluteRotationValue` and set the constant `MIN_ROTATION_VALUE` to this value. (Rounding the value up a little is fine.)
+- `MAX_ROTATION_VALUE`: Rotate the water boiler completely to the right. Read the value for `SensorAbsoluteRotationValue` and set the constant `MIN_ROTATION_VALUE` to this value. (Rounding the value down a little is fine.)
 - `MAX_REL_ROTATION_VALUE`: This value defines the maximum rotation value before the relative starting position is moved in the rotation direction. A higher value means that rotations are harder to reverse, a smaller value means that rotations are quick to reverse. Default value is `40`.
 
 ### 3.2. Switch settings
@@ -39,15 +41,17 @@ _In order to tune these settings, listen to the Arduino on the Serial Port (defa
 
 ### 3.3. Light settings
 _In order to tune these settings, listen to the Arduino on the Serial Port (default is 9600). Open the Serial Plotter, then continue._
-- `MIN_LIGHT_VALUE`: Place the water boiler in the position you want to use it and close the water boiler lid. Read the value for `LightValue` and set the constant `MIN_LIGHT_VALUE` to this value. (Rounding the value a little is fine.)
-- `MAX_LIGHT_VALUE`: Place the water boiler in the position you want to use it and open the water boiler lid completely. Read the value for `LightValue` and set the constant `MIN_LIGHT_VALUE` to this value. (Rounding the value a little is fine.)
+- `MIN_LIGHT_VALUE`: Place the water boiler in the position you want to use it and close the water boiler lid. Read the value for `SensorLightValue` and set the constant `MIN_LIGHT_VALUE` to this value. It is a good idea to add 10-20 to the constant's value to account for slight lighting variations.
+- `MAX_LIGHT_VALUE`: Place the water boiler in the position you want to use it and open the water boiler lid completely. Read the value for `SensorLightValue` and set the constant `MAX_LIGHT_VALUE` to this value. (Rounding the value down a little is fine.)
 
 ## 4. Usage
 The Water Boiler Controller emits the following values on the Serial Port (default 9600):
 - **AbsoluteRotationValue**: Provides a value between `-127` and `127` to indicate the absolute rotation position for the rotary potentiometer.
 - **RelativeRotationValue**: Provides a value between `-MAX_REL_ROTATION_VALUE` and `MAX_REL_ROTATION_VALUE` relative to the starting position of the controller.
-- **SwitchValue**: Provides a value between `0` and something between `600` and `700`. Anything that is above `SWITCH_TRIGGER_VALUE` activates the internal LED and should be counted as triggered/active.
+- **SwitchValue**: Provides a value between `0` and `1`. Anything that is above `SWITCH_TRIGGER_VALUE` activates the internal LED and should be counted as triggered/active.
 - **LightValue**: Provides a value between `0` and `255`. The higher the value, the more light is entering the water boiler.
+
+Sample output: `SensorAbsoluteRotationValue:473.00,AbsoluteRotationValue:-31,RelativeRotationValue:0,SwitchValue:0,SensorLightValue:519.00,LightValue:0`
 
 ## 5. Support
 For issues feel free to contact me on fvitalba@unibz.it, or by opening an Issue on the Repository.
