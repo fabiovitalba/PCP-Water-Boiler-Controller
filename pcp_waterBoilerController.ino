@@ -23,6 +23,17 @@ const int MAX_LIGHT_VALUE = 660;
 /// RELATIVE PARAMETERS ///
 int startingRotationValue = 0.0f;
 
+
+/// FILTER PARAMETERS ///
+const float ALPHA = 0.6f;
+const int SAMPLE_SIZE = 3;
+float samples[SAMPLE_SIZE];
+int currentSampleId = 0;
+float totalSampleValue = 0.0f;
+float avgSampleValue = 0.0f;
+float emaFilteredValue = 0.0f;
+
+
 void setup() {
   pinMode(SWITCH_PIN, INPUT);
   pinMode(ROTATION_PIN, INPUT);
@@ -36,11 +47,31 @@ void setup() {
   // Store the Starting Position for the variable resistor in order to be able to use the controller without
   // any particular starting position.
   startingRotationValue = getRotationValueFromSensorValue(analogRead(ROTATION_PIN));
+
+  // Initialize Sample Array
+  for (int i = 0; i < SAMPLE_SIZE; i++) {
+    samples[i] = 0.0f;
+  }
 }
 
 void loop() {
   // We read the variable resistors value in order to understand the water boilers position.
   float sensorRotationValue = analogRead(ROTATION_PIN);
+
+  // Filter the rotation value to smooth spikes in readings
+  totalSampleValue = totalSampleValue - samples[currentSampleId];
+  samples[currentSampleId] = sensorRotationValue;
+  totalSampleValue = totalSampleValue + samples[currentSampleId];
+  currentSampleId = currentSampleId + 1;
+
+  if (currentSampleId >= SAMPLE_SIZE) {
+    currentSampleId = 0;
+  }
+  avgSampleValue = totalSampleValue / SAMPLE_SIZE;
+
+  // Apply EMA filter
+  emaFilteredValue = (ALPHA * sensorRotationValue) + ((1.0 - ALPHA) * emaFilteredValue);
+
   int absoluteRotationValue = getRotationValueFromSensorValue(sensorRotationValue);
 
   // We use the Relative Rotation Value in order to ignore the starting position of the variable resistor.
@@ -74,6 +105,10 @@ void loop() {
 
   Serial.print("SensorAbsoluteRotationValue:"); Serial.print(sensorRotationValue); // For debugging & fine tuning
   Serial.print(",");
+  Serial.print("FilteredSensorAbsoluteRotationValue:"); Serial.print(avgSampleValue); // For debugging & fine tuning
+  Serial.print(",");
+  Serial.print("EMAFilteredSensorAbsoluteRotationValue:"); Serial.print(emaFilteredValue); // For debugging & fine tuning
+  Serial.print(",");
   Serial.print("AbsoluteRotationValue:"); Serial.print(absoluteRotationValue);
   Serial.print(",");
   Serial.print("RelativeRotationValue:"); Serial.print(relativeRotationValue);
@@ -84,7 +119,7 @@ void loop() {
   Serial.print(",");
   Serial.print("LightValue:"); Serial.print(lightValue);
   Serial.println();
-  delay(10);
+  delay(50);
 }
 
 int clampFloatToIntRange(float inputValue, int minIn, int maxIn, int minOut, int maxOut) {
