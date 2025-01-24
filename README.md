@@ -12,7 +12,7 @@ This Arduino Project consists in the arduino script that handles the Water Boile
 - A **switch** directly taken from the water boiler circuit. The switch consists in a broken circuit that closes whenever the button on the handle of the water boiler is closed.
 
 These inputs are used to produce the following outputs:
-- **SensorAbsoluteRotationValue**: The raw output produced by the rotary potentiometer.
+- **SensorAbsoluteRotationValue**: The raw output produced by the rotary potentiometer, filtered using EMA (Exponential Moving Average).
 - **AbsoluteRotationValue**: The absolute rotation of the water boiler. This is the processed output produced by the rotary potentiometer.
 - **RelativeRotationValue**: The rotation of the water boiler, relative to its starting position. The starting position is also continuously updated, so that anytime the user reverses the rotation, that reversal is immediately effective.
 - **SwitchValue**: The output produced by the switch circuit. Whenever the switch is not being pressed this will be 0. However, when the switch is being pressed, the circuit closes and the value will raise.
