@@ -46,8 +46,8 @@ _In order to tune these settings, listen to the Arduino on the Serial Port (defa
 
 ## 4. Usage
 The Water Boiler Controller emits the following values on the Serial Port (default 9600):
-- **AbsoluteRotationValue**: Provides a value between `-127` and `127` to indicate the absolute rotation position for the rotary potentiometer.
-- **RelativeRotationValue**: Provides a value between `-MAX_REL_ROTATION_VALUE` and `MAX_REL_ROTATION_VALUE` relative to the starting position of the controller.
+- **AbsoluteRotationValue**: Provides a value between `-127` and `127` to indicate the absolute rotation position for the rotary potentiometer. The value `127` is at the outer left maximum, while the value `-127` is at the outer right maximum.
+- **RelativeRotationValue**: Provides a value between `-MAX_REL_ROTATION_VALUE` and `MAX_REL_ROTATION_VALUE` relative to the starting position of the controller. Negative value indicate a rotation to the right, positive a rotation to the left.
 - **SwitchValue**: Provides a value between `0` and `1`. Anything that is above `SWITCH_TRIGGER_VALUE` activates the internal LED and should be counted as triggered/active.
 - **LightValue**: Provides a value between `0` and `255`. The higher the value, the more light is entering the water boiler.
 
