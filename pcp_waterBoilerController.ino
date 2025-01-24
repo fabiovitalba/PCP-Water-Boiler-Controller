@@ -6,7 +6,7 @@ const int LED_PIN = 10;
 
 
 /// ENVIRONMENT RELATIVE PARAMETERS ///
-const int MIN_ROTATION_VALUE = 350;
+const int MIN_ROTATION_VALUE = 380;
 const int MAX_ROTATION_VALUE = 675;
 const int MAX_REL_ROTATION_VALUE = 40;
 
@@ -23,6 +23,12 @@ const int MAX_LIGHT_VALUE = 660;
 /// RELATIVE PARAMETERS ///
 int startingRotationValue = 0.0f;
 
+
+/// FILTER PARAMETERS ///
+const float ALPHA = 0.9f;
+float emaFilteredValue = 0.0f;
+
+
 void setup() {
   pinMode(SWITCH_PIN, INPUT);
   pinMode(ROTATION_PIN, INPUT);
@@ -35,13 +41,14 @@ void setup() {
 
   // Store the Starting Position for the variable resistor in order to be able to use the controller without
   // any particular starting position.
-  startingRotationValue = getRotationValueFromSensorValue(analogRead(ROTATION_PIN));
+  emaFilteredValue = analogRead(ROTATION_PIN);
+  startingRotationValue = getRotationValueFromSensorValue(emaFilteredValue);
 }
 
 void loop() {
   // We read the variable resistors value in order to understand the water boilers position.
   float sensorRotationValue = analogRead(ROTATION_PIN);
-  int absoluteRotationValue = getRotationValueFromSensorValue(sensorRotationValue);
+  int absoluteRotationValue = getRotationValueFromSensorValue(applyEmaFilter(sensorRotationValue));
 
   // We use the Relative Rotation Value in order to ignore the starting position of the variable resistor.
   // A rotation to the left is translated into a positive value and a rotation to the right becomes a negative value.
@@ -72,7 +79,7 @@ void loop() {
   float sensorLightValue = analogRead(LIGHT_PIN);
   int lightValue = getLightValueFromSensorValue(sensorLightValue);
 
-  Serial.print("SensorAbsoluteRotationValue:"); Serial.print(sensorRotationValue); // For debugging & fine tuning
+  Serial.print("SensorAbsoluteRotationValue:"); Serial.print(emaFilteredValue); // For debugging & fine tuning
   Serial.print(",");
   Serial.print("AbsoluteRotationValue:"); Serial.print(absoluteRotationValue);
   Serial.print(",");
@@ -84,7 +91,7 @@ void loop() {
   Serial.print(",");
   Serial.print("LightValue:"); Serial.print(lightValue);
   Serial.println();
-  delay(10);
+  delay(50);
 }
 
 int clampFloatToIntRange(float inputValue, int minIn, int maxIn, int minOut, int maxOut) {
@@ -99,4 +106,9 @@ int getRotationValueFromSensorValue(float sensorValue) {
 
 int getLightValueFromSensorValue(float sensorValue) {
   return clampFloatToIntRange(sensorValue, MIN_LIGHT_VALUE, MAX_LIGHT_VALUE, 0, 255);
+}
+
+float applyEmaFilter(float rawInput) {
+  emaFilteredValue = (ALPHA * rawInput) + ((1.0 - ALPHA) * emaFilteredValue);
+  return emaFilteredValue;
 }
