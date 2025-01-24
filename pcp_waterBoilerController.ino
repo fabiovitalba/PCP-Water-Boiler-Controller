@@ -6,7 +6,7 @@ const int LED_PIN = 10;
 
 
 /// ENVIRONMENT RELATIVE PARAMETERS ///
-const int MIN_ROTATION_VALUE = 350;
+const int MIN_ROTATION_VALUE = 380;
 const int MAX_ROTATION_VALUE = 675;
 const int MAX_REL_ROTATION_VALUE = 40;
 
@@ -25,7 +25,7 @@ int startingRotationValue = 0.0f;
 
 
 /// FILTER PARAMETERS ///
-const float ALPHA = 0.4f;
+const float ALPHA = 0.9f;
 float emaFilteredValue = 0.0f;
 
 
@@ -41,15 +41,14 @@ void setup() {
 
   // Store the Starting Position for the variable resistor in order to be able to use the controller without
   // any particular starting position.
-  startingRotationValue = getRotationValueFromSensorValue(analogRead(ROTATION_PIN));
+  emaFilteredValue = analogRead(ROTATION_PIN);
+  startingRotationValue = getRotationValueFromSensorValue(emaFilteredValue);
 }
 
 void loop() {
   // We read the variable resistors value in order to understand the water boilers position.
   float sensorRotationValue = analogRead(ROTATION_PIN);
-  // Apply EMA filter
-  emaFilteredValue = (ALPHA * sensorRotationValue) + ((1.0 - ALPHA) * emaFilteredValue);
-  int absoluteRotationValue = getRotationValueFromSensorValue(emaFilteredValue);
+  int absoluteRotationValue = getRotationValueFromSensorValue(applyEmaFilter(sensorRotationValue));
 
   // We use the Relative Rotation Value in order to ignore the starting position of the variable resistor.
   // A rotation to the left is translated into a positive value and a rotation to the right becomes a negative value.
@@ -107,4 +106,9 @@ int getRotationValueFromSensorValue(float sensorValue) {
 
 int getLightValueFromSensorValue(float sensorValue) {
   return clampFloatToIntRange(sensorValue, MIN_LIGHT_VALUE, MAX_LIGHT_VALUE, 0, 255);
+}
+
+float applyEmaFilter(float rawInput) {
+  emaFilteredValue = (ALPHA * rawInput) + ((1.0 - ALPHA) * emaFilteredValue);
+  return emaFilteredValue;
 }
