@@ -7,7 +7,7 @@ const int LED_PIN = 10;
 
 /// ENVIRONMENT RELATIVE PARAMETERS ///
 const int MIN_ROTATION_VALUE = 380;
-const int MAX_ROTATION_VALUE = 675;
+const int MAX_ROTATION_VALUE = 640;
 const int MAX_REL_ROTATION_VALUE = 40;
 
 // The switch can assume values between 0 and ~600-700.
@@ -16,7 +16,7 @@ const int SWITCH_TRIGGER_VALUE = 300;
 
 // In absolute darkness the light sensor still return about ~500 (~580 with the lid closed) as a value.
 // At maximum brightness the light sensor reaches about ~660  (with the lid open and beneath a lamp).
-const int MIN_LIGHT_VALUE = 540;
+const int MIN_LIGHT_VALUE = 580;
 const int MAX_LIGHT_VALUE = 660;
 
 
@@ -81,7 +81,7 @@ void loop() {
 
   Serial.print("SensorAbsoluteRotationValue:"); Serial.print(emaFilteredValue); // For debugging & fine tuning
   Serial.print(",");
-  Serial.print("AbsoluteRotationValue:"); Serial.print(absoluteRotationValue);
+  Serial.print("AbsoluteRotationValue:"); Serial.print(-absoluteRotationValue);
   Serial.print(",");
   Serial.print("RelativeRotationValue:"); Serial.print(relativeRotationValue);
   Serial.print(",");
