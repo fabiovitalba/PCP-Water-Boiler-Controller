@@ -25,7 +25,7 @@ int startingRotationValue = 0.0f;
 
 
 /// FILTER PARAMETERS ///
-const float ALPHA = 0.9f;
+const float ALPHA = 0.9f; // The higher the value, the more we weigh recently read data.
 float emaFilteredValue = 0.0f;
 
 
