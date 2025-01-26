@@ -101,14 +101,14 @@ int clampIntToIntRange(int inputValue, int minIn, int maxIn, int minOut, int max
 }
 
 int getRotationValueFromSensorValue(int sensorValue) {
-  return clampIntToIntRange(sensorValue, MIN_ROTATION_VALUE, MAX_ROTATION_VALUE, -127.0f, 127.0f);
+  return clampIntToIntRange(sensorValue, MIN_ROTATION_VALUE, MAX_ROTATION_VALUE, -127, 127);
 }
 
 int getLightValueFromSensorValue(int sensorValue) {
-  return clampIntToIntRange(sensorValue, MIN_LIGHT_VALUE, MAX_LIGHT_VALUE, 0.0f, 255.0f);
+  return clampIntToIntRange(sensorValue, MIN_LIGHT_VALUE, MAX_LIGHT_VALUE, 0, 255);
 }
 
 int applyEmaFilter(int rawInput) {
-  emaFilteredValue = (ALPHA * rawInput) + ((1.0 - ALPHA) * emaFilteredValue);
+  emaFilteredValue = (ALPHA * rawInput) + ((1.0f - ALPHA) * emaFilteredValue);
   return emaFilteredValue;
 }
