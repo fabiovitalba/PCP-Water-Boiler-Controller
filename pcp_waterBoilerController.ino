@@ -6,6 +6,8 @@ const int LED_PIN = 10;
 
 
 /// ENVIRONMENT RELATIVE PARAMETERS ///
+// Values read by analog pins are voltages between 0V and 5V.
+// 0V corresponds to 0 and 5V corresponds to 1023.
 const int MIN_ROTATION_VALUE = 380;
 const int MAX_ROTATION_VALUE = 640;
 const int MAX_REL_ROTATION_VALUE = 40;
