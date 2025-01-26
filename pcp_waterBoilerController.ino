@@ -25,7 +25,7 @@ int startingRotationValue = 0;
 
 
 /// FILTER PARAMETERS ///
-const float ALPHA = 0.01f; // The higher the value, the more we weigh recently read data.
+const float ALPHA = 0.1f; // The higher the value, the more we weigh recently read data.
 int emaFilteredValue = 0;
 
 
@@ -47,8 +47,8 @@ void setup() {
 
 void loop() {
   // We read the variable resistors value in order to understand the water boilers position.
-  emaFilteredValue = analogRead(ROTATION_PIN);
-  int absoluteRotationValue = getRotationValueFromSensorValue(applyEmaFilter(emaFilteredValue));
+  int absoluteSensorValue = analogRead(ROTATION_PIN);
+  int absoluteRotationValue = getRotationValueFromSensorValue(applyEmaFilter(absoluteSensorValue));
 
   // We use the Relative Rotation Value in order to ignore the starting position of the variable resistor.
   // A rotation to the left is translated into a positive value and a rotation to the right becomes a negative value.
