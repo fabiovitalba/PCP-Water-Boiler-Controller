@@ -21,12 +21,12 @@ const int MAX_LIGHT_VALUE = 660;
 
 
 /// RELATIVE PARAMETERS ///
-int startingRotationValue = 0.0f;
+int startingRotationValue = 0;
 
 
 /// FILTER PARAMETERS ///
-const float ALPHA = 0.9f; // The higher the value, the more we weigh recently read data.
-float emaFilteredValue = 0.0f;
+const float ALPHA = 0.01f; // The higher the value, the more we weigh recently read data.
+int emaFilteredValue = 0;
 
 
 void setup() {
@@ -47,8 +47,8 @@ void setup() {
 
 void loop() {
   // We read the variable resistors value in order to understand the water boilers position.
-  float sensorRotationValue = analogRead(ROTATION_PIN);
-  int absoluteRotationValue = getRotationValueFromSensorValue(applyEmaFilter(sensorRotationValue));
+  emaFilteredValue = analogRead(ROTATION_PIN);
+  int absoluteRotationValue = getRotationValueFromSensorValue(applyEmaFilter(emaFilteredValue));
 
   // We use the Relative Rotation Value in order to ignore the starting position of the variable resistor.
   // A rotation to the left is translated into a positive value and a rotation to the right becomes a negative value.
@@ -76,7 +76,7 @@ void loop() {
 
   // We read the light reactive resistor's value in order to understand how far the water boilers lid
   // is opened.
-  float sensorLightValue = analogRead(LIGHT_PIN);
+  int sensorLightValue = analogRead(LIGHT_PIN);
   int lightValue = getLightValueFromSensorValue(sensorLightValue);
 
   Serial.print("SensorAbsoluteRotationValue:"); Serial.print(emaFilteredValue); // For debugging & fine tuning
@@ -94,21 +94,21 @@ void loop() {
   delay(50);
 }
 
-int clampFloatToIntRange(float inputValue, int minIn, int maxIn, int minOut, int maxOut) {
+int clampIntToIntRange(int inputValue, int minIn, int maxIn, int minOut, int maxOut) {
   int clampedValue = map(inputValue, minIn, maxIn, minOut, maxOut);
   clampedValue = constrain(clampedValue, minOut, maxOut);
   return clampedValue;
 }
 
-int getRotationValueFromSensorValue(float sensorValue) {
-  return clampFloatToIntRange(sensorValue, MIN_ROTATION_VALUE, MAX_ROTATION_VALUE, -127, 127);
+int getRotationValueFromSensorValue(int sensorValue) {
+  return clampIntToIntRange(sensorValue, MIN_ROTATION_VALUE, MAX_ROTATION_VALUE, -127.0f, 127.0f);
 }
 
-int getLightValueFromSensorValue(float sensorValue) {
-  return clampFloatToIntRange(sensorValue, MIN_LIGHT_VALUE, MAX_LIGHT_VALUE, 0, 255);
+int getLightValueFromSensorValue(int sensorValue) {
+  return clampIntToIntRange(sensorValue, MIN_LIGHT_VALUE, MAX_LIGHT_VALUE, 0.0f, 255.0f);
 }
 
-float applyEmaFilter(float rawInput) {
+int applyEmaFilter(int rawInput) {
   emaFilteredValue = (ALPHA * rawInput) + ((1.0 - ALPHA) * emaFilteredValue);
   return emaFilteredValue;
 }
